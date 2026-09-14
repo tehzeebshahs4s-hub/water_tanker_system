@@ -1,0 +1,17 @@
+{
+  "name": "water-tanker-system",
+  "version": "1.0.0",
+  "description": "Water Tanker Distribution Optimization System for Karachi - DAA Project",
+  "scripts": {
+    "client": "cd client && npm start",
+    "server": "cd server && node server.js",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "seed": "cd server && node seedData.js",
+    "install-all": "npm install && cd client && npm install && cd ../server && npm install"
+  },
+  "dependencies": {
+    "concurrently": "^8.2.2",
+    "cors": "^2.8.6",
+    "express": "^5.2.1"
+  }
+}

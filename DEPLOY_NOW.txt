@@ -1,0 +1,156 @@
+# ============================================
+# DEPLOY TO: watertanker.s4s.to.frosty-cerf.88-99-136-37.plesk.page
+# ============================================
+
+## 🚀 Quick Deploy (3 Steps)
+
+### Step 1: Upload File to Plesk
+1. Login to Plesk: https://88.99.136.37:8443/login_up.php
+2. Go to **File Manager**
+3. Navigate to: **watertanker.s4s.to** → **httpdocs**
+4. Upload: `water-tanker-deployment.tar.gz`
+   (File location: /root/water-tanker-system/water-tanker-deployment.tar.gz)
+
+### Step 2: Open SSH Terminal
+1. In Plesk, go to **Tools & Settings** → **SSH Terminal**
+   OR
+   Go to **Domains** → **watertanker.s4s.to** → **SSH Access**
+
+### Step 3: Run These Commands
+Copy and paste ALL commands at once:
+
+```bash
+cd /var/www/vhosts/watertanker.s4s.to/httpdocs && \
+tar -xzf water-tanker-deployment.tar.gz && \
+mv deployment/* . && \
+rm -rf deployment && \
+cd server && npm install --production && cd .. && \
+cd client && npm install && npm run build && cd .. && \
+node server/seedData.js && \
+pm2 start server/server-production.js --name water-tanker && \
+pm2 save && \
+echo "✅ DEPLOYMENT COMPLETE!"
+```
+
+### Step 4: Test Your Site
+Open: https://watertanker.s4s.to.frosty-cerf.88-99-136-37.plesk.page
+
+---
+
+## 📋 Alternative: Step-by-Step Commands
+
+If the one-liner doesn't work, run these one by one:
+
+```bash
+# 1. Navigate to httpdocs
+cd /var/www/vhosts/watertanker.s4s.to/httpdocs
+
+# 2. Extract deployment package
+tar -xzf water-tanker-deployment.tar.gz
+
+# 3. Move files to correct location
+mv deployment/* .
+
+# 4. Remove empty deployment folder
+rm -rf deployment
+
+# 5. Install server dependencies
+cd server
+npm install --production
+cd ..
+
+# 6. Build React frontend
+cd client
+npm install
+npm run build
+cd ..
+
+# 7. Seed the database
+node server/seedData.js
+
+# 8. Start the application
+pm2 start server/server-production.js --name water-tanker
+
+# 9. Save PM2 configuration
+pm2 save
+
+# 10. Verify it's running
+pm2 status
+```
+
+---
+
+## 🔧 Troubleshooting
+
+### If you see "Application Error":
+```bash
+pm2 logs water-tanker
+pm2 restart water-tanker
+```
+
+### If MongoDB connection fails:
+Option A: Use MongoDB Atlas (recommended)
+```bash
+nano /var/www/vhosts/watertanker.s4s.to/httpdocs/.env
+# Change MONGODB_URI to your Atlas connection string
+```
+
+Option B: Install MongoDB
+```bash
+sudo apt install -y mongodb
+sudo systemctl start mongodb
+sudo systemctl enable mongodb
+```
+
+### If permission errors:
+```bash
+sudo chown -R plesk:plesk /var/www/vhosts/watertanker.s4s.to/httpdocs
+chmod -R 755 /var/www/vhosts/watertanker.s4s.to/httpdocs
+```
+
+### If port 3000 is blocked:
+In Plesk, go to **Domains** → **watertanker.s4s.to** → **Hosting Settings**
+Enable **Proxy Mode** and set to port 3000
+
+---
+
+## 🌐 Your Live URLs
+
+| URL | Description |
+|-----|-------------|
+| https://watertanker.s4s.to.frosty-cerf.88-99-136-37.plesk.page | Main Dashboard |
+| https://watertanker.s4s.to.frosty-cerf.88-99-136-37.plesk.page/api/health | Health Check |
+| https://watertanker.s4s.to.frosty-cerf.88-99-136-37.plesk.page/api/analytics/dashboard | Dashboard API |
+
+---
+
+## 📊 Pages Available
+
+| Page | Path |
+|------|------|
+| Dashboard | `/` |
+| Route Optimizer | `/route-optimizer` |
+| Resource Assignment | `/resource-assignment` |
+| Scheduler | `/scheduler` |
+| Slot Allocator | `/slot-allocator` |
+| Flow Optimizer | `/flow-optimizer` |
+| Analytics | `/analytics` |
+
+---
+
+## 📞 Need Help?
+
+Run these diagnostic commands:
+```bash
+# Check if app is running
+pm2 status
+
+# View error logs
+pm2 logs water-tanker --lines 50
+
+# Check MongoDB
+systemctl status mongod
+
+# Test API
+curl http://localhost:3000/api/health
+```

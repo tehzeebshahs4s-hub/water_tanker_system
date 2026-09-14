@@ -1,0 +1,113 @@
+# ============================================
+# QUICK DEPLOYMENT INSTRUCTIONS
+# ============================================
+
+## STEP 1: Activate Domain in Plesk
+1. Login to Plesk: https://88.99.136.37:8443/login_up.php
+2. Go to **Domains** → **watertanker.s4s.to**
+3. If you see "Suspended" or "Disabled", click **Activate**
+4. Make sure the domain status is **Active**
+
+## STEP 2: Upload Deployment Package
+1. Go to **File Manager** in Plesk
+2. Navigate to: `/httpdocs/`
+3. Upload the file: `water-tanker-deployment.tar.gz`
+   (Located at: /root/water-tanker-system/water-tanker-deployment.tar.gz)
+
+## STEP 3: Open SSH Terminal
+1. In Plesk, go to **Tools & Settings** → **SSH Terminal**
+   (Or go to **Domains** → **watertanker.s4s.to** → look for SSH option)
+2. Login with your server credentials
+
+## STEP 4: Run Setup Script
+Copy and paste these commands one by one:
+
+```bash
+# Navigate to httpdocs
+cd /var/www/vhosts/watertanker.s4s.to/httpdocs
+
+# Extract the deployment package
+tar -xzf water-tanker-deployment.tar.gz
+
+# Install server dependencies
+cd server
+npm install --production
+cd ..
+
+# Build React frontend (if client folder exists)
+cd client
+npm install
+npm run build
+cd ..
+
+# Seed the database
+node server/seedData.js
+
+# Install PM2 if not installed
+npm install -g pm2
+
+# Start the application
+pm2 start server/server-production.js --name water-tanker
+pm2 save
+pm2 startup
+```
+
+## STEP 5: Configure Node.js in Plesk (if available)
+1. Go to **Domains** → **watertanker.s4s.to** → **Node.js**
+2. Set:
+   - Node.js version: 14.x or higher
+   - Application mode: Production
+   - Application root: /httpdocs
+   - Application startup file: server/server-production.js
+3. Click **Enable Node.js**
+
+## STEP 6: Test Your Site
+Open in browser: https://www.watertanker.s4s.to
+
+---
+
+## Troubleshooting
+
+### If site still shows "Suspended":
+1. Check domain status in Plesk → Domains → watertanker.s4s.to
+2. Make sure subscription is active
+3. Contact hosting provider if needed
+
+### If you see "Application Error":
+```bash
+# Check logs
+pm2 logs water-tanker
+
+# Restart
+pm2 restart water-tanker
+```
+
+### If MongoDB connection fails:
+Option A: Use MongoDB Atlas (cloud)
+```bash
+# Edit .env file
+nano /var/www/vhosts/watertanker.s4s.to/httpdocs/.env
+
+# Change MONGODB_URI to your Atlas connection string:
+# MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/water-tanker-system
+```
+
+Option B: Install MongoDB locally
+```bash
+sudo apt install -y mongodb
+sudo systemctl start mongodb
+sudo systemctl enable mongodb
+```
+
+### If permissions error:
+```bash
+sudo chown -R plesk:plesk /var/www/vhosts/watertanker.s4s.to/httpdocs
+chmod -R 755 /var/www/vhosts/watertanker.s4s.to/httpdocs
+```
+
+---
+
+## Important URLs
+- Frontend: https://www.watertanker.s4s.to
+- API Health: https://www.watertanker.s4s.to/api/health
+- Dashboard API: https://www.watertanker.s4s.to/api/analytics/dashboard
